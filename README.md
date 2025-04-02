@@ -1,5 +1,3 @@
-# traffic-predictor-toronto
-
 # 🚦 Smart Traffic Congestion Prediction & Route Optimization in Toronto
 
 ## Overview
