@@ -1,4 +1,4 @@
-# Traffic_Congestion_BigData
+# traffic-predictor-toronto
 
 # 🚦 Smart Traffic Congestion Prediction & Route Optimization in Toronto
 
