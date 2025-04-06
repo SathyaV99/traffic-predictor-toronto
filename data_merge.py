@@ -2,14 +2,19 @@ from pyspark.sql import SparkSession
 
 spark = SparkSession.builder.appName("TrafficMerge").getOrCreate()
 
+HDFS_BASE_PATH = "hdfs://localhost:9000/user/hdoop/toronto_traffic/input/"
+
 # Load transformed traffic & weather data
-traffic_long_df = spark.read.parquet("hdfs://path/to/transformed_traffic.parquet")
-weather_df = spark.read.parquet("hdfs://path/to/cleaned_weather.parquet")
+traffic_long_df = spark.read.parquet(f"{HDFS_BASE_PATH}cleaned_traffic.parquet")
+weather_df = spark.read.parquet(f"{HDFS_BASE_PATH}cleaned_weather.parquet")
+
+# Rename weather date column to match traffic data
+weather_df = weather_df.withColumnRenamed("Date/Time", "date")
 
 # Merge datasets on 'date'
 final_df = traffic_long_df.join(weather_df, on="date", how="left")
 
 # Save merged dataset
-final_df.write.mode("overwrite").parquet("hdfs://path/to/final_traffic_weather.parquet")
+final_df.write.mode("overwrite").parquet(f"{HDFS_BASE_PATH}final_traffic_weather.parquet")
 
 print("Data Merging Complete.")
