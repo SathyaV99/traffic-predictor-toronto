@@ -1,1 +1,0 @@
-{"class":"org.apache.spark.ml.feature.OneHotEncoder","timestamp":1744027413981,"sparkVersion":"3.5.4","uid":"OneHotEncoder_2959f3a12b91","paramMap":{"outputCol":"camera_vec","inputCol":"camera_index"},"defaultParamMap":{"dropLast":true,"outputCol":"OneHotEncoder_2959f3a12b91__output","handleInvalid":"error"}}

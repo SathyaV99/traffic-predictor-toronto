@@ -1,0 +1,1 @@
+{"class":"org.apache.spark.ml.feature.VectorAssembler","timestamp":1744059639786,"sparkVersion":"3.5.4","uid":"VectorAssembler_df257feb1ea4","paramMap":{"outputCol":"features","inputCols":["Month","Day","day_of_week","is_weekend","Mean_Temp_C","Total_Precip_mm","temp_range_vec"]},"defaultParamMap":{"outputCol":"VectorAssembler_df257feb1ea4__output","handleInvalid":"error"}}

@@ -1,1 +1,0 @@
-{"class":"org.apache.spark.ml.feature.StringIndexer","timestamp":1744027413457,"sparkVersion":"3.5.4","uid":"StringIndexer_a80b13bc95c1","paramMap":{"handleInvalid":"keep","inputCol":"traffic_camera","outputCol":"camera_index"},"defaultParamMap":{"handleInvalid":"error","stringOrderType":"frequencyDesc","outputCol":"StringIndexer_a80b13bc95c1__output"}}
