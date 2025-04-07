@@ -1,14 +1,10 @@
-from pyspark.sql import SparkSession
+def run_saving(spark):
+    HDFS_BASE_PATH = "hdfs://localhost:9000/user/hdoop/toronto_traffic/input/"
 
-spark = SparkSession.builder.appName("SaveProcessedData").getOrCreate()
+    # Load final processed data
+    final_df = spark.read.parquet(f"{HDFS_BASE_PATH}final_traffic_weather.parquet")
 
-HDFS_BASE_PATH = "hdfs://localhost:9000/user/hdoop/toronto_traffic/input/"
+    # Save to CSV or other formats for analysis
+    final_df.write.mode("overwrite").csv(f"{HDFS_BASE_PATH}final_traffic_weather.csv", header=True)
 
-# Load final processed data
-final_df = spark.read.parquet(f"{HDFS_BASE_PATH}final_traffic_weather.parquet")
-
-# Save to CSV or other formats for analysis
-final_df.write.mode("overwrite").csv(f"{HDFS_BASE_PATH}final_traffic_weather.csv", header=True)
-
-print("Final Data Saved for Analysis.")
-
+    print("✅ Final Data Saved for Analysis.")

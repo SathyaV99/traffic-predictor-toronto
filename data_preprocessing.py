@@ -55,32 +55,33 @@ print("🎉 Data Preprocessing Complete.")
 """
 
 
-
-
-
-from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
 
-spark = SparkSession.builder.appName("TrafficPreprocessing").getOrCreate()
+def run_preprocessing(spark):
+    HDFS_BASE_PATH = "hdfs://localhost:9000/user/hdoop/toronto_traffic/input/"
 
-HDFS_BASE_PATH = "hdfs://localhost:9000/user/hdoop/toronto_traffic/input/"
+    # Load raw data
+    traffic_df = spark.read.parquet(f"{HDFS_BASE_PATH}raw_traffic.parquet")
+    weather_df = spark.read.parquet(f"{HDFS_BASE_PATH}raw_weather.parquet")
 
-# Load raw data
-traffic_df = spark.read.parquet(f"{HDFS_BASE_PATH}raw_traffic.parquet")
-weather_df = spark.read.parquet(f"{HDFS_BASE_PATH}raw_weather.parquet")
+    # Filter only Toronto traffic data
+    traffic_df = traffic_df.filter(traffic_df["traffic_source"] == "Toronto")
 
-# Filter only Toronto data
-traffic_df = traffic_df.filter(traffic_df["traffic_source"] == "Toronto")
+    # Handle missing values
+    traffic_df = traffic_df.fillna({"traffic_count": 0})
 
-# Handle missing values
-traffic_df = traffic_df.fillna({"traffic_count": 0})
-weather_df = weather_df.fillna({"Max Temp (°C)": weather_df.selectExpr("percentile(`Max Temp (°C)`, 0.5)").collect()[0][0]})
-weather_df = weather_df.fillna({"Min Temp (°C)": weather_df.selectExpr("percentile(`Min Temp (°C)`, 0.5)").collect()[0][0]})
-weather_df = weather_df.fillna({"Total Precip (mm)": 0})  # Assume no rain if missing
+    # Fill weather missing values
+    median_max_temp = weather_df.selectExpr("percentile(`Max Temp (°C)`, 0.5)").collect()[0][0]
+    median_min_temp = weather_df.selectExpr("percentile(`Min Temp (°C)`, 0.5)").collect()[0][0]
 
-# Save cleaned data
-traffic_df.write.mode("overwrite").parquet(f"{HDFS_BASE_PATH}cleaned_traffic.parquet")
-weather_df.write.mode("overwrite").parquet(f"{HDFS_BASE_PATH}cleaned_weather.parquet")
+    weather_df = weather_df.fillna({
+        "Max Temp (°C)": median_max_temp,
+        "Min Temp (°C)": median_min_temp,
+        "Total Precip (mm)": 0  # Assume no rain if missing
+    })
 
-print("Data Preprocessing Complete.")
+    # Save cleaned data
+    traffic_df.write.mode("overwrite").parquet(f"{HDFS_BASE_PATH}cleaned_traffic.parquet")
+    weather_df.write.mode("overwrite").parquet(f"{HDFS_BASE_PATH}cleaned_weather.parquet")
 
+    print("✅ Data Preprocessing Complete.")
