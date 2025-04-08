@@ -117,7 +117,7 @@ source spark-venv/bin/activate
 
 Then navigate or cd into the ‘git’ repository
 
-![][image2]  
+![][image2]
 
 Ran into an error, it seems i defined a different mkdir than what was mentioned in the code. I didn’t think about this. Hence, creating a new mkdir as follows to stay inline with the code.
 
