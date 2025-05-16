@@ -2,6 +2,8 @@
 
 The project focuses on processing raw traffic and weather CSV data for the city of Toronto using a Hadoop-Spark pipeline. The README details how to set up the necessary Hadoop and Spark daemons, configure the environment (including creating a Python virtual environment), ingest and transform data, and then merge and clean the datasets. Ultimately, the processed data supports downstream analysis and traffic prediction tasks using Spark and machine learning models.
 
+![image](https://github.com/user-attachments/assets/aa5422be-7830-424e-95b7-096ed0318c7c)
+
 
 **📝 Overview**
 
