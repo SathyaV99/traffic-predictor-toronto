@@ -80,89 +80,135 @@ source spark-venv/bin/activate
 
 ---
 
-## Data Ingestion
+## Methodology
 
-### 1. HDFS Directory Setup
+### Step 1 - Start Hadoop and Spark
+
 ```bash
+# Hadoop
+cd ~/hadoop-3.4.1/sbin
+./start-dfs.sh
+./start-yarn.sh
+
+# Spark
+cd /opt/spark/sbin
+start-master.sh
+start-worker.sh spark://<your-host>:7077
+
+# Check processes
+jps
+```
+
+### Step 2 - Create and Activate Virtual Environment (if not already created)
+
+```bash
+python3 -m venv spark-venv
+source spark-venv/bin/activate
+```
+
+### Step 3 - Fix HDFS Directory Paths
+
+```bash
+hdfs dfs -rm -r /user/hadoop/toronto_traffic/input
+hdfs dfs -rm -r /user/hadoop/toronto_traffic/
 hdfs dfs -mkdir /user/hdoop/toronto_traffic
 hdfs dfs -mkdir /user/hdoop/toronto_traffic/input
 ```
 
-### 2. Upload Data
+### Step 4 - Upload Data to HDFS
+
 ```bash
-hdfs dfs -put *.csv /user/hdoop/toronto_traffic/input
+hdfs dfs -put path/to/*.csv /user/hdoop/toronto_traffic/input
 ```
 
----
+### Step 5 - Run the Pipeline
 
-## Spark Job Pipeline
+```bash
+export PYSPARK_PYTHON=/home/hdoop/spark-venv/bin/python
+spark-submit run_pipeline.py
+```
 
-### 1. `run_transformation.py`
-- Converts wide-format traffic data into long format
-- Fixes malformed headers and parses date strings
-- Saves to: `transformed_traffic_data`
+### Step 6 - Pipeline Modules Overview
 
-### 2. `run_ingestion.py`
-- Reads transformed traffic and multiple weather files
-- Combines into Parquet: `raw_traffic.parquet`, `raw_weather.parquet`
+- `run_transformation(spark)`: Reads and reshapes traffic data into long format
+- `run_ingestion(spark)`: Reads and combines weather and traffic into Parquet
+- `run_preprocessing(spark)`: Filters Toronto records, fills nulls
+- `run_merge(spark)`: Joins weather and traffic on `date`
+- `run_saving(spark)`: Converts Parquet to CSV
 
-### 3. `run_preprocessing.py`
-- Filters Toronto-specific rows
-- Fills missing values (0 or median)
-- Outputs: `cleaned_traffic.parquet`, `cleaned_weather.parquet`
+### Step 7 - Handle Multiple Spark Sessions
 
-### 4. `run_merge.py`
-- Merges traffic and weather on `date`
-- Output: `final_traffic_weather.parquet`
+Avoid creating multiple Spark sessions across files. Use imports and function calls instead of `os.system`.
 
-### 5. `run_saving.py`
-- Converts merged Parquet to CSV
-- Output: `final_traffic_weather.csv`
+### Step 8 - Export Java Path (if Spark Worker doesn't show up)
 
----
+```bash
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+export PATH=$JAVA_HOME/bin:$PATH
+```
 
-## Feature Engineering & Cleaning
+Make this permanent by appending to `~/.bashrc`.
 
-### Engineer Features
+### Step 9 - Merge Output CSV Parts
+
+```bash
+hdfs dfs -getmerge /user/hdoop/toronto_traffic/input/final_traffic_weather.csv final_traffic_weather.csv
+```
+
+### Step 10 - View in Jupyter Notebook
+
+```bash
+pip install notebook
+jupyter notebook
+```
+
+Copy URL shown in terminal and open in browser.
+
+### Step 11 - Configure PySpark in Jupyter
+
+```bash
+pip install pyspark ipykernel
+python -m ipykernel install --user --name=spark-venv --display-name "Spark (PySpark)"
+```
+
+### Step 12 - Feature Engineering & Cleaning
+
 ```bash
 spark-submit engineer_balance_export.py
-```
-
-### Handle Nulls
-```bash
 spark-submit clean_nulls_from_csv.py
-```
-
-### Combine Cleaned CSV
-```bash
 spark-submit combine.py
 ```
 
-### Upload to HDFS
+### Step 13 - Upload Combined File to HDFS
+
 ```bash
 hdfs dfs -put combined.csv /user/hdoop/toronto_traffic/input
 ```
 
----
-
-## Model Training and Prediction
+### Step 14 - Run Final Prediction
 
 ```bash
 spark-submit predict_final_pipeline.py
 ```
 
-Output:
-- `final_predictions_csv/`
-- `final_rf_model/`
+### Step 15 - Download Final Outputs
 
----
+```bash
+hdfs dfs -get /user/hdoop/toronto_traffic/output/final_predictions_csv
+hdfs dfs -get /user/hdoop/toronto_traffic/output/final_rf_model
+```
 
-## Evaluation Metrics
+### Step 16 - Evaluate in Notebook
+
+Open `predict_final_pipeline_analysis.ipynb`
+
+**Classification Report:**
 - Accuracy: 0.6420
 - F1 Score: 0.6373
 - Precision: 0.6494
 - Recall: 0.6420
-- Confusion Matrix:
+
+**Confusion Matrix:**
 ```
 [[11488. 10241.]
  [ 5344. 16459.]]
