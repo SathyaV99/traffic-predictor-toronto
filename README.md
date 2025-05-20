@@ -225,7 +225,10 @@ python -m ipykernel install --user --name=spark-venv --display-name "Spark (PySp
 jupyter notebook
 ```
 
-Open the URL displayed and explore results using the notebook: `predict_final_pipeline_analysis.ipynb`
+Open and explore results using the notebook: `predict_final_pipeline_analysis.ipynb`
+
+![image](https://github.com/user-attachments/assets/4fe0d196-4ac9-485b-894f-514ad30666ce)
+
 
 ---
 
