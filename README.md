@@ -200,7 +200,7 @@ hdfs dfs -get /user/hdoop/toronto_traffic/output/final_rf_model
 
 ### Step 16 - Evaluate in Notebook
 
-Open `predict_final_pipeline_analysis.ipynb`
+Open `predict_final_pipeline_analysis.ipynb` in Folder "Iteration3"
 
 **Classification Report:**
 - Accuracy: 0.6420
